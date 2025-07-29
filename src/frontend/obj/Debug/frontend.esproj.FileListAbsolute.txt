@@ -1,0 +1,2 @@
+C:\Users\keorapetse.fani\source\repos\balance_challange\Aspire\src\frontend\obj\Debug\frontend.esproj.CoreCompileInputs.cache
+C:\Users\keorapetse.fani\source\repos\balance_challange\src\frontend\obj\Debug\frontend.esproj.CoreCompileInputs.cache

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "txn_001",
+    "type": "deposit",
+    "amount": 2000,
+    "currency": "ZAR",
+    "status": "success",
+    "date": "2024-03-25T10:15:00Z",
+    "description": "Deposit via Credit Card"
+  },
+  {
+    "id": "txn_002",
+    "type": "withdrawal",
+    "amount": 500,
+    "currency": "ZAR",
+    "status": "failed",
+    "date": "2024-03-26T08:32:00Z",
+    "description": "Withdrawal to Bank Account"
+  },
+  {
+    "id": "txn_003",
+    "type": "deposit",
+    "amount": 1500,
+    "currency": "ZAR",
+    "status": "success",
+    "date": "2024-03-27T14:20:00Z",
+    "description": "Deposit via E-Wallet"
+  },
+  {
+    "id": "txn_004",
+    "type": "deposit",
+    "amount": 750,
+    "currency": "ZAR",
+    "status": "success",
+    "date": "2024-03-28T09:45:00Z",
+    "description": "Gaming Bonus"
+  },
+  {
+    "id": "txn_005",
+    "type": "withdrawal",
+    "amount": 1200,
+    "currency": "ZAR",
+    "status": "success",
+    "date": "2024-03-29T16:30:00Z",
+    "description": "Withdrawal to E-Wallet"
+  },
+  {
+    "id": "txn_006",
+    "type": "deposit",
+    "amount": 300,
+    "currency": "ZAR",
+    "status": "success",
+    "date": "2024-03-30T11:15:00Z",
+    "description": "Referral Bonus"
+  }
+]
