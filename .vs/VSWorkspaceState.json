@@ -1,0 +1,14 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Aspire",
+    "\\Aspire\\src",
+    "\\Aspire\\src\\Aspire.ApiService",
+    "\\Aspire\\src\\Aspire.AppHost",
+    "\\Aspire\\src\\Aspire.ServiceDefaults",
+    "\\Aspire\\src\\Aspire.Tests",
+    "\\Aspire\\src\\frontend"
+  ],
+  "SelectedNode": "\\Aspire\\src\\Aspire.ApiService\\Aspire.ApiService.csproj",
+  "PreviewInSolutionExplorer": false
+}

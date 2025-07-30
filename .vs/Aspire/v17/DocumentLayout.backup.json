@@ -1,0 +1,75 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\keorapetse.fani\\source\\repos\\balance_challange\\Aspire\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{64BA8700-5E35-433E-68FE-2C1B3D215569}|src\\frontend\\frontend.esproj|c:\\users\\keorapetse.fani\\source\\repos\\balance_challange\\aspire\\src\\frontend\\package.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{64BA8700-5E35-433E-68FE-2C1B3D215569}|src\\frontend\\frontend.esproj|solutionrelative:src\\frontend\\package.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{64BA8700-5E35-433E-68FE-2C1B3D215569}|src\\frontend\\frontend.esproj|c:\\users\\keorapetse.fani\\source\\repos\\balance_challange\\aspire\\src\\frontend\\src\\app.vue||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{64BA8700-5E35-433E-68FE-2C1B3D215569}|src\\frontend\\frontend.esproj|solutionrelative:src\\frontend\\src\\app.vue||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{64BA8700-5E35-433E-68FE-2C1B3D215569}|src\\frontend\\frontend.esproj|c:\\users\\keorapetse.fani\\source\\repos\\balance_challange\\aspire\\src\\frontend\\src\\main.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{64BA8700-5E35-433E-68FE-2C1B3D215569}|src\\frontend\\frontend.esproj|solutionrelative:src\\frontend\\src\\main.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "package.json",
+              "DocumentMoniker": "C:\\Users\\keorapetse.fani\\source\\repos\\balance_challange\\Aspire\\src\\frontend\\package.json",
+              "RelativeDocumentMoniker": "src\\frontend\\package.json",
+              "ToolTip": "C:\\Users\\keorapetse.fani\\source\\repos\\balance_challange\\Aspire\\src\\frontend\\package.json",
+              "RelativeToolTip": "src\\frontend\\package.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-07-29T20:24:26.897Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "App.vue",
+              "DocumentMoniker": "C:\\Users\\keorapetse.fani\\source\\repos\\balance_challange\\Aspire\\src\\frontend\\src\\App.vue",
+              "RelativeDocumentMoniker": "src\\frontend\\src\\App.vue",
+              "ToolTip": "C:\\Users\\keorapetse.fani\\source\\repos\\balance_challange\\Aspire\\src\\frontend\\src\\App.vue",
+              "RelativeToolTip": "src\\frontend\\src\\App.vue",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003491|",
+              "WhenOpened": "2025-07-29T20:24:14.774Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "main.ts",
+              "DocumentMoniker": "C:\\Users\\keorapetse.fani\\source\\repos\\balance_challange\\Aspire\\src\\frontend\\src\\main.ts",
+              "RelativeDocumentMoniker": "src\\frontend\\src\\main.ts",
+              "ToolTip": "C:\\Users\\keorapetse.fani\\source\\repos\\balance_challange\\Aspire\\src\\frontend\\src\\main.ts",
+              "RelativeToolTip": "src\\frontend\\src\\main.ts",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2025-07-29T20:24:11.754Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

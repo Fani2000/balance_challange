@@ -34,6 +34,7 @@
             :rules="amountRules"
             class="mb-4"
             autofocus
+            :disabled="loading"
           >
             <template #append-inner>
               <span class="text-caption text-medium-emphasis">ZAR</span>
@@ -51,6 +52,7 @@
                 size="small"
                 @click="amount = quickAmount"
                 class="text-none"
+                :disabled="loading"
               >
                 R{{ quickAmount }}
               </v-btn>
@@ -67,6 +69,7 @@
             variant="outlined"
             :rules="[v => !!v || 'Payment method is required']"
             class="mb-4"
+            :disabled="loading"
           >
             <template #selection="{ item }">
               <div class="d-flex align-center">
@@ -83,6 +86,35 @@
               </v-list-item>
             </template>
           </v-select>
+
+          <!-- Current Balance Display -->
+          <v-alert
+            color="info"
+            variant="tonal"
+            class="mb-4"
+          >
+            <template #prepend>
+              <v-icon>mdi-wallet</v-icon>
+            </template>
+            <div class="text-caption">
+              Current balance: <strong>R{{ store.walletBalance.toLocaleString() }}</strong>
+            </div>
+          </v-alert>
+
+          <!-- Error Display -->
+          <v-alert
+            v-if="error"
+            color="error"
+            variant="tonal"
+            class="mb-4"
+            closable
+            @click:close="error = null"
+          >
+            <template #prepend>
+              <v-icon>mdi-alert-circle</v-icon>
+            </template>
+            {{ error }}
+          </v-alert>
 
           <!-- Security Notice -->
           <v-alert
@@ -105,7 +137,7 @@
         <v-spacer></v-spacer>
         <v-btn
           variant="outlined"
-          @click="$emit('update:modelValue', false)"
+          @click="handleCancel"
           :disabled="loading"
         >
           Cancel
@@ -115,7 +147,7 @@
           variant="elevated"
           @click="handleSubmit"
           :loading="loading"
-          :disabled="!valid"
+          :disabled="!valid || !amount || !paymentMethod"
           class="px-6"
         >
           <v-icon start>mdi-credit-card</v-icon>
@@ -127,7 +159,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useBankingStore } from '../../store/banking'
 
 const props = defineProps({
   modelValue: Boolean
@@ -135,21 +168,25 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'success'])
 
+// Store
+const store = useBankingStore()
+
 // Form state
 const form = ref(null)
 const valid = ref(false)
 const amount = ref('')
 const paymentMethod = ref('')
 const loading = ref(false)
+const error = ref(null)
 
 // Configuration
 const quickAmounts = [100, 500, 1000, 2500, 5000]
 
 const paymentMethods = [
-  { value: 'card', label: 'Credit/Debit Card', icon: 'mdi-credit-card' },
-  { value: 'eft', label: 'Instant EFT', icon: 'mdi-bank' },
-  { value: 'ewallet', label: 'E-Wallet', icon: 'mdi-wallet' },
-  { value: 'crypto', label: 'Cryptocurrency', icon: 'mdi-bitcoin' }
+  { value: 'Credit Card', label: 'Credit/Debit Card', icon: 'mdi-credit-card' },
+  { value: 'Instant EFT', label: 'Instant EFT', icon: 'mdi-bank' },
+  { value: 'E-Wallet', label: 'E-Wallet', icon: 'mdi-wallet' },
+  { value: 'Cryptocurrency', label: 'Cryptocurrency', icon: 'mdi-bitcoin' }
 ]
 
 // Validation rules
@@ -162,39 +199,67 @@ const amountRules = [
 
 // Methods
 const handleSubmit = async () => {
+  // Clear previous errors
+  error.value = null
+
+  // Validate form
   const { valid: isValid } = await form.value.validate()
   if (!isValid) return
 
   loading.value = true
 
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    // Use store deposit method which calls the API
+    await store.deposit(parseFloat(amount.value), paymentMethod.value)
 
-    // Simulate random success/failure for demo
-    const success = Math.random() > 0.1 // 90% success rate
+    // Emit success event to parent component
+    emit('success', parseFloat(amount.value), paymentMethod.value)
 
-    if (success) {
-      emit('success', parseFloat(amount.value), paymentMethod.value)
-      emit('update:modelValue', false)
+    // Close modal
+    emit('update:modelValue', false)
 
-      // Reset form
-      amount.value = ''
-      paymentMethod.value = ''
-      form.value.reset()
-    } else {
-      throw new Error('Payment failed')
-    }
-  } catch (error) {
-    // In a real app, show error message
-    console.error('Deposit failed:', error)
+    // Reset form
+    resetForm()
+
+  } catch (err) {
+    error.value = err.message || 'Deposit failed. Please try again.'
+    console.error('Deposit failed:', err)
   } finally {
     loading.value = false
   }
 }
+
+const handleCancel = () => {
+  if (!loading.value) {
+    resetForm()
+    emit('update:modelValue', false)
+  }
+}
+
+const resetForm = () => {
+  amount.value = ''
+  paymentMethod.value = ''
+  error.value = null
+  if (form.value) {
+    form.value.reset()
+  }
+}
+
+// Watch for modal close to reset form
+watch(() => props.modelValue, (newValue) => {
+  if (!newValue) {
+    // Reset form when modal closes
+    setTimeout(resetForm, 300) // Delay to avoid visual glitch
+  }
+})
+
+// Watch for store errors
+watch(() => store.error, (newError) => {
+  if (newError && newError.includes('Deposit')) {
+    error.value = newError
+  }
+})
 </script>
-
-
 
 <style scoped>
 .bonmoja-logo {
@@ -202,26 +267,13 @@ const handleSubmit = async () => {
   align-items: center;
 }
 
-.min-height-screen {
-  min-height: 100vh;
-}
-
 /* Custom gradient backgrounds */
 .bg-gradient-to-r {
   background: linear-gradient(to right, var(--v-theme-primary), var(--v-theme-secondary));
 }
 
-/* Smooth scroll behavior */
-html {
-  scroll-behavior: smooth;
-}
-
 /* Mobile-first responsive adjustments */
 @media (max-width: 600px) {
-  .v-container {
-    padding: 16px 12px;
-  }
-
   .v-card-title {
     padding: 16px 16px 12px;
   }
@@ -229,16 +281,16 @@ html {
   .v-card-text {
     padding: 16px;
   }
+
+  .v-card-actions {
+    padding: 16px;
+    padding-top: 0;
+  }
 }
 
 /* Custom hover effects */
-.v-btn:hover {
+.v-btn:hover:not(:disabled) {
   transform: translateY(-1px);
   transition: transform 0.2s ease;
-}
-
-.v-card:hover {
-  transform: translateY(-2px);
-  transition: transform 0.3s ease;
 }
 </style>

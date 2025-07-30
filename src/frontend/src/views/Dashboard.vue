@@ -22,7 +22,7 @@
 
       <template #append>
         <div class="d-flex align-center mr-4">
-          <v-chip variant="outlined" size="small" class="mr-3">ZAR</v-chip>
+          <v-chip variant="outlined" size="small" class="mr-3">{{ walletCurrency }}</v-chip>
           <v-btn icon size="small">
             <v-avatar size="32" class="bg-grey-lighten-2">
               <v-icon>mdi-account</v-icon>
@@ -52,12 +52,25 @@
           <!-- Wallet Balance Card -->
           <WalletBalanceCard
             :balance="walletBalance"
-            :currency="'ZAR'"
+            :currency="walletCurrency"
             :loading="loading.wallet"
             @deposit="openDepositModal"
             @withdraw="openWithdrawModal"
             class="mb-6"
           />
+
+          <!-- Data Source Indicator (for debugging) -->
+          <v-alert
+            v-if="dataSource.wallet || dataSource.transactions"
+            type="info"
+            variant="tonal"
+            class="mb-4"
+            density="compact"
+          >
+            Data sources:
+            Wallet: {{ dataSource.wallet || 'unknown' }},
+            Transactions: {{ dataSource.transactions || 'unknown' }}
+          </v-alert>
 
           <!-- Quick Actions -->
           <v-row class="mb-6">
@@ -156,46 +169,49 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useBankingStore } from '../store/banking'
 
 // Components
-import WalletBalanceCard from '../components/WalletBalanceCard.vue'
-import WalletBalanceSkeleton from '../components/WalletBalanceSkeleton.vue'
-import TransactionList from '../components/TransactionList.vue'
-import TransactionListSkeleton from '../components/TransactionListSkeleton.vue'
-import TransactionFilters from '../components/TransactionFilters.vue'
+import WalletBalanceCard from '../components/Wallet/WalletBalanceCard.vue'
+import WalletBalanceSkeleton from '../components/Wallet/WalletBalanceSkeleton.vue'
+import TransactionList from '../components/Transaction/TransactionList.vue'
+import TransactionListSkeleton from '../components/Transaction/TransactionListSkeleton.vue'
+import TransactionFilters from '../components/Transaction/TransactionFilters.vue'
 import QuickActionCard from '../components/QuickActionCard.vue'
-import DepositModal from '../components/DepositModal.vue'
-import WithdrawModal from '../components/WithdrawModal.vue'
+import DepositModal from '../components/Modals/DepositModal.vue'
+import WithdrawModal from '../components/Modals/WithdrawModal.vue'
 import ErrorMessage from '../components/ErrorMessage.vue'
 
+// Store
 const store = useBankingStore()
 
-// State
-const walletBalance = ref(7250.50) // From mock API
-const transactions = ref([])
-const error = ref(null)
+// Local state
 const showDepositModal = ref(false)
 const showWithdrawModal = ref(false)
 const transactionFilter = ref('all')
 const transactionSort = ref('date-desc')
 
-const loading = reactive({
-  wallet: false,
-  transactions: false
-})
-
-const snackbar = reactive({
+const snackbar = ref({
   show: false,
   message: '',
   color: 'success',
   icon: 'mdi-check-circle'
 })
 
+// Computed properties from store
+const walletBalance = computed(() => store.walletBalance)
+const walletCurrency = computed(() => store.walletCurrency)
+const loading = computed(() => ({
+  wallet: store.loading,
+  transactions: store.loading
+}))
+const error = computed(() => store.error)
+const dataSource = computed(() => store.dataSource)
+
 // Computed
 const filteredTransactions = computed(() => {
-  let filtered = [...transactions.value]
+  let filtered = [...store.transactions]
 
   // Apply filter
   if (transactionFilter.value !== 'all') {
@@ -223,74 +239,18 @@ const filteredTransactions = computed(() => {
 
 // Methods
 const fetchWalletData = async () => {
-  await Promise.all([
-    fetchWalletBalance(),
-    fetchTransactions()
-  ])
-}
-
-const fetchWalletBalance = async () => {
-  loading.wallet = true
   try {
-    // Try mock API first, fallback to backend
-    try {
-      const response = await fetch('/api/wallet.json')
-      if (response.ok) {
-        const data = await response.json()
-        walletBalance.value = data.balance
-        return
-      }
-    } catch (mockError) {
-      console.log('Mock API not available, using backend')
-    }
-
-    // Fallback to backend API
-    const account = await store.fetchAccount()
-    if (account) {
-      walletBalance.value = account.balance
-    }
-  } catch (err) {
-    error.value = 'Failed to load wallet balance'
-    console.error('Error fetching wallet:', err)
-  } finally {
-    loading.wallet = false
+    await store.refreshAllData()
+  } catch (error) {
+    console.error('Error fetching wallet data:', error)
   }
 }
 
 const fetchTransactions = async () => {
-  loading.transactions = true
   try {
-    // Try mock API first, fallback to backend
-    try {
-      const response = await fetch('/api/transactions.json')
-      if (response.ok) {
-        const data = await response.json()
-        transactions.value = data
-        return
-      }
-    } catch (mockError) {
-      console.log('Mock API not available, using backend')
-    }
-
-    // Fallback to backend API
-    const backendTransactions = await store.fetchTransactions()
-    if (backendTransactions) {
-      // Convert backend format to match mock API format
-      transactions.value = backendTransactions.map(t => ({
-        id: t.id.toString(),
-        type: t.type.toLowerCase().replace('_', ''),
-        amount: Math.abs(t.amount),
-        currency: 'ZAR',
-        status: 'success',
-        date: t.createdAt,
-        description: t.description
-      }))
-    }
-  } catch (err) {
-    error.value = 'Failed to load transactions'
-    console.error('Error fetching transactions:', err)
-  } finally {
-    loading.transactions = false
+    await store.fetchTransactions()
+  } catch (error) {
+    console.error('Error fetching transactions:', error)
   }
 }
 
@@ -303,7 +263,6 @@ const openWithdrawModal = () => {
 }
 
 const openSupport = () => {
-  // Placeholder for support functionality
   showNotification('Support chat will be available soon!', 'info', 'mdi-information')
 }
 
@@ -314,59 +273,43 @@ const scrollToTransactions = () => {
   }
 }
 
-const handleDepositSuccess = (amount, paymentMethod) => {
-  // Update wallet balance optimistically
-  walletBalance.value += amount
-
-  // Add new transaction
-  const newTransaction = {
-    id: `txn_${Date.now()}`,
-    type: 'deposit',
-    amount: amount,
-    currency: 'ZAR',
-    status: 'success',
-    date: new Date().toISOString(),
-    description: `Deposit via ${paymentMethod}`
+const handleDepositSuccess = async (amount, paymentMethod) => {
+  try {
+    showNotification(
+      `Successfully deposited ${walletCurrency.value}${amount.toLocaleString()}`,
+      'success',
+      'mdi-check-circle'
+    )
+  } catch (error) {
+    showNotification(
+      `Deposit failed: ${error.message}`,
+      'error',
+      'mdi-alert-circle'
+    )
   }
-
-  transactions.value.unshift(newTransaction)
-
-  showNotification(
-    `Successfully deposited R${amount.toLocaleString()}`,
-    'success',
-    'mdi-check-circle'
-  )
 }
 
-const handleWithdrawSuccess = (amount, method) => {
-  // Update wallet balance optimistically
-  walletBalance.value -= amount
-
-  // Add new transaction
-  const newTransaction = {
-    id: `txn_${Date.now()}`,
-    type: 'withdrawal',
-    amount: amount,
-    currency: 'ZAR',
-    status: 'success',
-    date: new Date().toISOString(),
-    description: `Withdrawal to ${method}`
+const handleWithdrawSuccess = async (amount, method) => {
+  try {
+    showNotification(
+      `Successfully withdrew ${walletCurrency.value}${amount.toLocaleString()}`,
+      'success',
+      'mdi-check-circle'
+    )
+  } catch (error) {
+    showNotification(
+      `Withdrawal failed: ${error.message}`,
+      'error',
+      'mdi-alert-circle'
+    )
   }
-
-  transactions.value.unshift(newTransaction)
-
-  showNotification(
-    `Successfully withdrew R${amount.toLocaleString()}`,
-    'success',
-    'mdi-check-circle'
-  )
 }
 
 const showNotification = (message, color = 'success', icon = 'mdi-check-circle') => {
-  snackbar.message = message
-  snackbar.color = color
-  snackbar.icon = icon
-  snackbar.show = true
+  snackbar.value.message = message
+  snackbar.value.color = color
+  snackbar.value.icon = icon
+  snackbar.value.show = true
 }
 
 // Lifecycle

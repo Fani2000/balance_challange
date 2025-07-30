@@ -120,6 +120,58 @@ public class AccountService : IAccountService
         await _context.SaveChangesAsync();
         return true;
     }
+    
+    public async Task<bool> DepositAsync(int accountId, decimal amount, string paymentMethod)
+    {
+        if (amount <= 0) return false;
+
+        var account = await _context.Accounts
+            .FirstOrDefaultAsync(a => a.Id == accountId && a.IsActive);
+
+        if (account == null) return false;
+
+        // Add to account balance
+        account.Balance += amount;
+    
+        // Create transaction record
+        _context.Transactions.Add(new Transaction
+        {
+            AccountId = accountId,
+            Type = TransactionType.DEPOSIT,
+            Amount = amount,
+            Description = $"Deposit via {paymentMethod}",
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> WithdrawAsync(int accountId, decimal amount, string withdrawalMethod)
+    {
+        if (amount <= 0) return false;
+
+        var account = await _context.Accounts
+            .FirstOrDefaultAsync(a => a.Id == accountId && a.IsActive);
+
+        if (account == null || account.Balance < amount) return false;
+
+        // Deduct from account balance
+        account.Balance -= amount;
+
+        // Create transaction record
+        _context.Transactions.Add(new Transaction
+        {
+            AccountId = accountId,
+            Type = TransactionType.WITHDRAWAL,
+            Amount = -amount, // Negative amount for withdrawals
+            Description = $"Withdrawal to {withdrawalMethod}",
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
 
     public async Task<bool> CloseAccountAsync(int accountId, string username, string pin)
     {
@@ -133,4 +185,5 @@ public class AccountService : IAccountService
         await _context.SaveChangesAsync();
         return true;
     }
+    
 }

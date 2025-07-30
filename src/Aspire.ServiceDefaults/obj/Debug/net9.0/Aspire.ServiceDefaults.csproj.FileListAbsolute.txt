@@ -10,3 +10,4 @@ C:\Users\keorapetse.fani\source\repos\balance_challange\src\Aspire.ServiceDefaul
 C:\Users\keorapetse.fani\source\repos\balance_challange\src\Aspire.ServiceDefaults\obj\Debug\net9.0\refint\Aspire.ServiceDefaults.dll
 C:\Users\keorapetse.fani\source\repos\balance_challange\src\Aspire.ServiceDefaults\obj\Debug\net9.0\Aspire.ServiceDefaults.pdb
 C:\Users\keorapetse.fani\source\repos\balance_challange\src\Aspire.ServiceDefaults\obj\Debug\net9.0\ref\Aspire.ServiceDefaults.dll
+C:\Users\keorapetse.fani\source\repos\balance_challange\src\Aspire.ServiceDefaults\obj\Debug\net9.0\Aspire.ServiceDefaults.sourcelink.json

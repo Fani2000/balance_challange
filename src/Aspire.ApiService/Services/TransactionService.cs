@@ -12,7 +12,7 @@ public class TransactionService : ITransactionService
         _context = context;
     }
 
-    public async Task<IEnumerable<TransactionDto>> GetTransactionsAsync(int accountId, int page = 1, int pageSize = 20)
+    public async Task<IEnumerable<TransactionDto>> GetTransactionsAsync(int accountId, int page = 1, int pageSize = 6)
     {
         var transactions = await _context.Transactions
             .Where(t => t.AccountId == accountId)
@@ -23,7 +23,7 @@ public class TransactionService : ITransactionService
 
         return transactions.Select(t => new TransactionDto(
             t.Id,
-            t.Type,
+            t.Type.ToString(),
             t.Amount,
             t.Description,
             t.Recipient,

@@ -9,4 +9,8 @@ public interface IAccountService
     Task<bool> TransferMoneyAsync(int fromAccountId, string toUsername, decimal amount);
     Task<bool> RequestLoanAsync(int accountId, decimal amount);
     Task<bool> CloseAccountAsync(int accountId, string username, string pin);
+    
+    Task<bool> DepositAsync(int accountId, decimal amount, string paymentMethod);
+    
+    Task<bool> WithdrawAsync(int accountId, decimal amount, string withdrawalMethod);
 }

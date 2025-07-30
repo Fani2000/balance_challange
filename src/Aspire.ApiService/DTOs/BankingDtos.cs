@@ -11,7 +11,7 @@ public record AccountDto(
 
 public record TransactionDto(
     int Id,
-    TransactionType Type,
+    string Type,
     decimal Amount,
     string Description,
     string? Recipient,
@@ -26,4 +26,14 @@ public record AccountSummaryDto(
     decimal TotalIn,
     decimal TotalOut,
     decimal Interest
+);
+
+public record DepositRequest(
+    decimal Amount,
+    string PaymentMethod
+);
+
+public record WithdrawRequest(
+    decimal Amount,
+    string WithdrawalMethod
 );

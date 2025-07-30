@@ -30,19 +30,51 @@
             type="number"
             step="0.01"
             min="50"
-            :max="maxAmount"
+            :max="availableBalance"
             :rules="amountRules"
             class="mb-4"
             autofocus
+            :disabled="loading"
           >
             <template #append-inner>
               <span class="text-caption text-medium-emphasis">ZAR</span>
             </template>
           </v-text-field>
 
+          <!-- Quick Amount Buttons -->
+          <div class="mb-4" v-if="availableBalance > 0">
+            <p class="text-subtitle-2 mb-3">Quick amounts:</p>
+            <div class="d-flex flex-wrap ga-2">
+              <v-btn
+                v-for="quickAmount in availableQuickAmounts"
+                :key="quickAmount"
+                variant="outlined"
+                size="small"
+                @click="amount = quickAmount"
+                class="text-none"
+                :disabled="loading"
+              >
+                R{{ quickAmount }}
+              </v-btn>
+            </div>
+          </div>
+
           <!-- Available Balance -->
-          <v-alert color="info" variant="tonal" class="mb-4">
-            Available balance: <strong>R{{ maxAmount.toLocaleString() }}</strong>
+          <v-alert
+            :color="availableBalance > 0 ? 'info' : 'warning'"
+            variant="tonal"
+            class="mb-4"
+          >
+            <template #prepend>
+              <v-icon>{{ availableBalance > 0 ? 'mdi-wallet' : 'mdi-alert' }}</v-icon>
+            </template>
+            <div class="text-caption">
+              <strong>Available balance: R{{ availableBalance.toLocaleString() }}</strong>
+              <br v-if="availableBalance <= 0">
+              <span v-if="availableBalance <= 0" class="text-warning">
+                Insufficient funds for withdrawal
+              </span>
+            </div>
           </v-alert>
 
           <!-- Withdrawal Method -->
@@ -55,6 +87,7 @@
             variant="outlined"
             :rules="[v => !!v || 'Withdrawal method is required']"
             class="mb-4"
+            :disabled="loading"
           >
             <template #selection="{ item }">
               <div class="d-flex align-center">
@@ -74,6 +107,21 @@
               </v-list-item>
             </template>
           </v-select>
+
+          <!-- Error Display -->
+          <v-alert
+            v-if="error"
+            color="error"
+            variant="tonal"
+            class="mb-4"
+            closable
+            @click:close="error = null"
+          >
+            <template #prepend>
+              <v-icon>mdi-alert-circle</v-icon>
+            </template>
+            {{ error }}
+          </v-alert>
 
           <!-- Processing Time Notice -->
           <v-alert
@@ -96,7 +144,7 @@
         <v-spacer></v-spacer>
         <v-btn
           variant="outlined"
-          @click="$emit('update:modelValue', false)"
+          @click="handleCancel"
           :disabled="loading"
         >
           Cancel
@@ -106,7 +154,7 @@
           variant="elevated"
           @click="handleSubmit"
           :loading="loading"
-          :disabled="!valid"
+          :disabled="!valid || !amount || !withdrawalMethod || availableBalance <= 0"
           class="px-6"
         >
           <v-icon start>mdi-bank-transfer-out</v-icon>
@@ -118,17 +166,17 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useBankingStore } from '../../store/banking'
 
 const props = defineProps({
-  modelValue: Boolean,
-  maxAmount: {
-    type: Number,
-    default: 10000
-  }
+  modelValue: Boolean
 })
 
 const emit = defineEmits(['update:modelValue', 'success'])
+
+// Store
+const store = useBankingStore()
 
 // Form state
 const form = ref(null)
@@ -136,23 +184,32 @@ const valid = ref(false)
 const amount = ref('')
 const withdrawalMethod = ref('')
 const loading = ref(false)
+const error = ref(null)
+
+// Computed
+const availableBalance = computed(() => store.walletBalance || 0)
+
+const availableQuickAmounts = computed(() => {
+  const quickAmounts = [100, 500, 1000, 2500, 5000]
+  return quickAmounts.filter(amount => amount <= availableBalance.value)
+})
 
 // Configuration
 const withdrawalMethods = [
   {
-    value: 'bank',
+    value: 'Bank Account',
     label: 'Bank Account',
     icon: 'mdi-bank',
     description: 'Direct transfer to your bank account'
   },
   {
-    value: 'ewallet',
+    value: 'E-Wallet',
     label: 'E-Wallet',
     icon: 'mdi-wallet',
     description: 'Transfer to your e-wallet'
   },
   {
-    value: 'card',
+    value: 'Debit Card',
     label: 'Debit Card',
     icon: 'mdi-credit-card',
     description: 'Instant transfer to your card'
@@ -160,36 +217,114 @@ const withdrawalMethods = [
 ]
 
 // Validation rules
-const amountRules = [
+const amountRules = computed(() => [
   v => !!v || 'Amount is required',
   v => v >= 50 || 'Minimum withdrawal is R50',
-  v => v <= props.maxAmount || `Maximum withdrawal is R${props.maxAmount.toLocaleString()}`,
-  v => /^\d+(\.\d{1,2})?$/.test(v) || 'Invalid amount format'
-]
+  v => v <= availableBalance.value || `Maximum withdrawal is R${availableBalance.value.toLocaleString()}`,
+  v => /^\d+(\.\d{1,2})?$/.test(v) || 'Invalid amount format',
+  v => availableBalance.value > 0 || 'Insufficient funds'
+])
 
 // Methods
 const handleSubmit = async () => {
+  // Clear previous errors
+  error.value = null
+
+  // Validate form
   const { valid: isValid } = await form.value.validate()
   if (!isValid) return
+
+  // Check sufficient funds
+  if (parseFloat(amount.value) > availableBalance.value) {
+    error.value = 'Insufficient funds for this withdrawal'
+    return
+  }
 
   loading.value = true
 
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    // Use store withdraw method which calls the API
+    await store.withdraw(parseFloat(amount.value), withdrawalMethod.value)
 
-    // Simulate success
+    // Emit success event to parent component
     emit('success', parseFloat(amount.value), withdrawalMethod.value)
+
+    // Close modal
     emit('update:modelValue', false)
 
     // Reset form
-    amount.value = ''
-    withdrawalMethod.value = ''
-    form.value.reset()
-  } catch (error) {
-    console.error('Withdrawal failed:', error)
+    resetForm()
+
+  } catch (err) {
+    error.value = err.message || 'Withdrawal failed. Please try again.'
+    console.error('Withdrawal failed:', err)
   } finally {
     loading.value = false
   }
 }
+
+const handleCancel = () => {
+  if (!loading.value) {
+    resetForm()
+    emit('update:modelValue', false)
+  }
+}
+
+const resetForm = () => {
+  amount.value = ''
+  withdrawalMethod.value = ''
+  error.value = null
+  if (form.value) {
+    form.value.reset()
+  }
+}
+
+// Watch for modal close to reset form
+watch(() => props.modelValue, (newValue) => {
+  if (!newValue) {
+    // Reset form when modal closes
+    setTimeout(resetForm, 300) // Delay to avoid visual glitch
+  } else {
+    // Refresh balance when modal opens
+    if (store.walletBalance === 0) {
+      store.fetchWallet()
+    }
+  }
+})
+
+// Watch for store errors
+watch(() => store.error, (newError) => {
+  if (newError && newError.includes('Withdrawal')) {
+    error.value = newError
+  }
+})
 </script>
+
+<style scoped>
+/* Custom gradient backgrounds */
+.bg-gradient-to-r {
+  background: linear-gradient(to right, var(--v-theme-primary), var(--v-theme-secondary));
+}
+
+/* Mobile-first responsive adjustments */
+@media (max-width: 600px) {
+  .v-card-title {
+    padding: 16px 16px 12px;
+  }
+
+  .v-card-text {
+    padding: 16px;
+  }
+
+  .v-card-actions {
+    padding: 16px;
+    padding-top: 0;
+  }
+}
+
+/* Custom hover effects */
+.v-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  transition: transform 0.2s ease;
+}
+</style>
