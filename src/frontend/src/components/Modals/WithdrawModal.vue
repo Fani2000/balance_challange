@@ -167,7 +167,10 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useBankingStore } from '../../store/banking'
+import { useWalletStore } from '../../store/wallet.store'
+import { useTransactionStore } from '../../store/transaction.store'
+import { useUIStore } from '../../store/global.ui.store'
+import {storeToRefs} from 'pinia'
 
 const props = defineProps({
   modelValue: Boolean
@@ -176,18 +179,17 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'success'])
 
 // Store
-const store = useBankingStore()
+const { balance, loading, error } = storeToRefs(useWalletStore())
+const { withdraw } = useWalletStore()
 
 // Form state
 const form = ref(null)
 const valid = ref(false)
 const amount = ref('')
 const withdrawalMethod = ref('')
-const loading = ref(false)
-const error = ref(null)
 
 // Computed
-const availableBalance = computed(() => store.walletBalance || 0)
+const availableBalance = computed(() => balance.value || 0)
 
 const availableQuickAmounts = computed(() => {
   const quickAmounts = [100, 500, 1000, 2500, 5000]
@@ -244,7 +246,7 @@ const handleSubmit = async () => {
 
   try {
     // Use store withdraw method which calls the API
-    await store.withdraw(parseFloat(amount.value), withdrawalMethod.value)
+    await withdraw(parseFloat(amount.value), withdrawalMethod.value)
 
     // Emit success event to parent component
     emit('success', parseFloat(amount.value), withdrawalMethod.value)
@@ -286,14 +288,14 @@ watch(() => props.modelValue, (newValue) => {
     setTimeout(resetForm, 300) // Delay to avoid visual glitch
   } else {
     // Refresh balance when modal opens
-    if (store.walletBalance === 0) {
-      store.fetchWallet()
+    if (balance.value === 0) {
+      fetchWallet()
     }
   }
 })
 
 // Watch for store errors
-watch(() => store.error, (newError) => {
+watch(() => error, (newError) => {
   if (newError && newError.includes('Withdrawal')) {
     error.value = newError
   }

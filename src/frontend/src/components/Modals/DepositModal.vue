@@ -97,7 +97,7 @@
               <v-icon>mdi-wallet</v-icon>
             </template>
             <div class="text-caption">
-              Current balance: <strong>R{{ store.walletBalance.toLocaleString() }}</strong>
+              Current balance: <strong>R{{ balance?.toLocaleString() }}</strong>
             </div>
           </v-alert>
 
@@ -160,7 +160,11 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useBankingStore } from '../../store/banking'
+import {storeToRefs} from "pinia";
+import {useWalletStore} from "../../store/wallet.store";
+
+const { loading, error, balance } = storeToRefs(useWalletStore())
+const { addDeposit: deposit } = useWalletStore()
 
 const props = defineProps({
   modelValue: Boolean
@@ -168,16 +172,11 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'success'])
 
-// Store
-const store = useBankingStore()
-
 // Form state
 const form = ref(null)
 const valid = ref(false)
 const amount = ref('')
 const paymentMethod = ref('')
-const loading = ref(false)
-const error = ref(null)
 
 // Configuration
 const quickAmounts = [100, 500, 1000, 2500, 5000]
@@ -209,8 +208,7 @@ const handleSubmit = async () => {
   loading.value = true
 
   try {
-    // Use store deposit method which calls the API
-    await store.deposit(parseFloat(amount.value), paymentMethod.value)
+    await deposit(parseFloat(amount.value))
 
     // Emit success event to parent component
     emit('success', parseFloat(amount.value), paymentMethod.value)
@@ -254,7 +252,7 @@ watch(() => props.modelValue, (newValue) => {
 })
 
 // Watch for store errors
-watch(() => store.error, (newError) => {
+watch(() => error, (newError) => {
   if (newError && newError.includes('Deposit')) {
     error.value = newError
   }

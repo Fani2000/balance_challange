@@ -1,7 +1,9 @@
 ﻿export interface WalletBalance {
   balance: number
   currency: string
-  source: 'backend' | 'mock'
+  source?: 'backend' | 'mock',
+  loading?: boolean,
+  error?: string | null
 }
 
 export interface AccountSummary {

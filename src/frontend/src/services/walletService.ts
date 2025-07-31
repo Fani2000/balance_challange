@@ -20,6 +20,7 @@ export class WalletService implements IWalletService {
    * Fetch wallet balance from backend API first, fallback to mock
    */
   async getWalletBalance(): Promise<WalletBalance> {
+    /*
     try {
       // Try backend API first
       const response: Response = await fetch(`${this.baseUrl}/Account`)
@@ -34,6 +35,7 @@ export class WalletService implements IWalletService {
     } catch (error: any) {
       console.log('Backend API not available, trying mock data')
     }
+     */
 
     try {
       // Fallback to mock API

@@ -22,7 +22,7 @@
 
       <template #append>
         <div class="d-flex align-center mr-4">
-          <v-chip variant="outlined" size="small" class="mr-3">{{ walletCurrency }}</v-chip>
+          <v-chip variant="outlined" size="small" class="mr-3">{{ currency }}</v-chip>
           <v-btn icon size="small">
             <v-avatar size="32" class="bg-grey-lighten-2">
               <v-icon>mdi-account</v-icon>
@@ -44,33 +44,20 @@
         <ErrorMessage
           v-else-if="error"
           :message="error"
-          @retry="fetchWalletData"
+          @retry="fetchWallet"
         />
 
         <!-- Main Content -->
         <div v-else>
           <!-- Wallet Balance Card -->
           <WalletBalanceCard
-            :balance="walletBalance"
-            :currency="walletCurrency"
+            :balance="balance"
+            :currency="currency"
             :loading="loading.wallet"
             @deposit="openDepositModal"
             @withdraw="openWithdrawModal"
             class="mb-6"
           />
-
-          <!-- Data Source Indicator (for debugging) -->
-          <v-alert
-            v-if="dataSource.wallet || dataSource.transactions"
-            type="info"
-            variant="tonal"
-            class="mb-4"
-            density="compact"
-          >
-            Data sources:
-            Wallet: {{ dataSource.wallet || 'unknown' }},
-            Transactions: {{ dataSource.transactions || 'unknown' }}
-          </v-alert>
 
           <!-- Quick Actions -->
           <v-row class="mb-6">
@@ -170,7 +157,10 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useBankingStore } from '../store/banking'
+import { useWalletStore } from '../store/wallet.store'
+import { useTransactionStore } from '../store/transaction.store'
+import { useUIStore } from '../store/global.ui.store'
+import { storeToRefs } from 'pinia'
 
 // Components
 import WalletBalanceCard from '../components/Wallet/WalletBalanceCard.vue'
@@ -184,11 +174,14 @@ import WithdrawModal from '../components/Modals/WithdrawModal.vue'
 import ErrorMessage from '../components/ErrorMessage.vue'
 
 // Store
-const store = useBankingStore()
+const { fetchWallet, addDeposit } = useWalletStore()
+const { fetchTransactions } = useTransactionStore()
+const { transactions, loading: transactionLoading } = storeToRefs(useTransactionStore())
+const { balance, currency, withdraw, loading:walletLoading, error:walletError } = storeToRefs(useWalletStore())
+const {showDepositModal, showWithdrawModal} = storeToRefs(useUIStore())
+const {openDepositModal, openWithdrawModal} = useUIStore()
 
 // Local state
-const showDepositModal = ref(false)
-const showWithdrawModal = ref(false)
 const transactionFilter = ref('all')
 const transactionSort = ref('date-desc')
 
@@ -200,67 +193,44 @@ const snackbar = ref({
 })
 
 // Computed properties from store
-const walletBalance = computed(() => store.walletBalance)
-const walletCurrency = computed(() => store.walletCurrency)
 const loading = computed(() => ({
-  wallet: store.loading,
-  transactions: store.loading
+  wallet: walletLoading.value,
+  transactions: transactionLoading.value
 }))
-const error = computed(() => store.error)
-const dataSource = computed(() => store.dataSource)
+const error = computed(() => walletError.value)
+// const dataSource = computed(() => store.dataSource)
 
 // Computed
 const filteredTransactions = computed(() => {
-  let filtered = [...store.transactions]
+  console.log("Transactions: ", transactions.value)
+  let filtered = transactions.value
 
   // Apply filter
   if (transactionFilter.value !== 'all') {
     filtered = filtered.filter(t => t.type === transactionFilter.value)
   }
 
+  console.log("Transactions: ", filtered)
+
   // Apply sort
   switch (transactionSort.value) {
     case 'date-desc':
-      filtered.sort((a, b) => new Date(b.date) - new Date(a.date))
+      filtered?.sort((a, b) => new Date(b.date) - new Date(a.date))
       break
     case 'date-asc':
-      filtered.sort((a, b) => new Date(a.date) - new Date(b.date))
+      filtered?.sort((a, b) => new Date(a.date) - new Date(b.date))
       break
     case 'amount-desc':
-      filtered.sort((a, b) => b.amount - a.amount)
+      filtered?.sort((a, b) => b.amount - a.amount)
       break
     case 'amount-asc':
-      filtered.sort((a, b) => a.amount - b.amount)
+      filtered?.sort((a, b) => a.amount - b.amount)
       break
   }
 
   return filtered
 })
 
-// Methods
-const fetchWalletData = async () => {
-  try {
-    await store.refreshAllData()
-  } catch (error) {
-    console.error('Error fetching wallet data:', error)
-  }
-}
-
-const fetchTransactions = async () => {
-  try {
-    await store.fetchTransactions()
-  } catch (error) {
-    console.error('Error fetching transactions:', error)
-  }
-}
-
-const openDepositModal = () => {
-  showDepositModal.value = true
-}
-
-const openWithdrawModal = () => {
-  showWithdrawModal.value = true
-}
 
 const openSupport = () => {
   showNotification('Support chat will be available soon!', 'info', 'mdi-information')
@@ -275,8 +245,10 @@ const scrollToTransactions = () => {
 
 const handleDepositSuccess = async (amount, paymentMethod) => {
   try {
+    addDeposit(amount)
+
     showNotification(
-      `Successfully deposited ${walletCurrency.value}${amount.toLocaleString()}`,
+      `Successfully deposited ${currency.value}${amount.toLocaleString()}`,
       'success',
       'mdi-check-circle'
     )
@@ -291,8 +263,10 @@ const handleDepositSuccess = async (amount, paymentMethod) => {
 
 const handleWithdrawSuccess = async (amount, method) => {
   try {
+    withdraw(amount)
+
     showNotification(
-      `Successfully withdrew ${walletCurrency.value}${amount.toLocaleString()}`,
+      `Successfully withdrew ${currency.value}${amount.toLocaleString()}`,
       'success',
       'mdi-check-circle'
     )
@@ -314,7 +288,8 @@ const showNotification = (message, color = 'success', icon = 'mdi-check-circle')
 
 // Lifecycle
 onMounted(() => {
-  fetchWalletData()
+  fetchWallet()
+  fetchTransactions()
 })
 </script>
 
