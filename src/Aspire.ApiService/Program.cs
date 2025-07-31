@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire client integrations.
-builder.AddServiceDefaults();
+// builder.AddServiceDefaults();
 
 // Add services to the container.
-builder.Services.AddProblemDetails();
+// builder.Services.AddProblemDetails();
 
 // Add Entity Framework
 builder.Services.AddDbContext<BankingContext>(options =>
@@ -17,11 +17,13 @@ builder.Services.AddDbContext<BankingContext>(options =>
 
 
 // Add Redis for distributed caching
+/*
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("cache");
     options.InstanceName = "bankingCache:";
 });
+*/
 
 // Add repositories and services
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -47,10 +49,14 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var port = Environment.GetEnvironmentVariable("PORT");
+
+builder.WebHost.UseUrls($"http://+:{port}");
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-app.MapDefaultEndpoints();
+// app.MapDefaultEndpoints();
 
 if (app.Environment.IsDevelopment())
 {

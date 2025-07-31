@@ -33,7 +33,7 @@ export class TransactionService implements ITransactionService {
         console.log("Backend Transactions: ", backendTransactions)
 
         // Transform backend format to frontend format
-        const transformedTransactions: Transaction[] = backendTransactions.map((t: TransactionDto) => ({
+        const transformedTransactions: any = backendTransactions.map((t: TransactionDto) => ({
           id: t.id.toString(),
           type: this.transformTransactionType(t.type),
           amount: Math.abs(t.amount),

@@ -1,0 +1,143 @@
+﻿server {
+    listen 80;
+    server_name localhost;
+    
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_types
+        text/plain
+        text/css
+        text/xml
+        text/javascript
+        application/json
+        application/javascript
+        application/xml+rss
+        application/atom+xml
+        image/svg+xml;
+
+    # Handle SPA routing - serve index.html for all routes
+    location / {
+        try_files $uri $uri/ /index.html;
+        
+        # Cache control for HTML files
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        add_header Pragma "no-cache";
+        add_header Expires "0";
+    }
+
+    # API proxy configuration for Azure backend
+    location /api/ {
+        # Proxy to Azure App Service
+        proxy_pass ${VITE_API_URL}/api/;
+        proxy_http_version 1.1;
+        
+        # Essential headers for Azure App Service
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host hfo-mongo-orders-egdcdjgfb3byfhge.canadacentral-01.azurewebsites.net;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_cache_bypass $http_upgrade;
+        
+        # Timeout settings for Azure
+        proxy_connect_timeout 120s;
+        proxy_send_timeout 120s;
+        proxy_read_timeout 120s;
+        
+        # Buffer settings
+        proxy_buffering on;
+        proxy_buffer_size 8k;
+        proxy_buffers 8 8k;
+        
+        # Handle CORS if not handled by backend
+        add_header Access-Control-Allow-Origin * always;
+        add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization" always;
+        
+        # Handle preflight requests
+        if ($request_method = 'OPTIONS') {
+            add_header Access-Control-Allow-Origin * always;
+            add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
+            add_header Access-Control-Allow-Headers "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization" always;
+            add_header Access-Control-Max-Age 1728000;
+            add_header Content-Type 'text/plain; charset=utf-8';
+            add_header Content-Length 0;
+            return 204;
+        }
+    }
+
+    # Direct proxy for root API calls (without /api prefix)
+    location ~ ^/(orders|users|auth|health)(/.*)?$ {
+        proxy_pass ${VITE_API_BASE_URL}$request_uri;
+        proxy_http_version 1.1;
+        
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host hfo-mongo-orders-egdcdjgfb3byfhge.canadacentral-01.azurewebsites.net;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        
+        proxy_connect_timeout 120s;
+        proxy_send_timeout 120s;
+        proxy_read_timeout 120s;
+        
+        # CORS headers
+        add_header Access-Control-Allow-Origin * always;
+        add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization" always;
+        
+        if ($request_method = 'OPTIONS') {
+            add_header Access-Control-Allow-Origin * always;
+            add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
+            add_header Access-Control-Allow-Headers "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization" always;
+            add_header Access-Control-Max-Age 1728000;
+            add_header Content-Type 'text/plain; charset=utf-8';
+            add_header Content-Length 0;
+            return 204;
+        }
+    }
+
+    # Static assets with long-term caching
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|wasm)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+
+    # Config.js with no caching (for runtime configuration)
+    location = /config.js {
+        expires -1;
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        add_header Pragma "no-cache";
+    }
+
+    # Health check endpoint
+    location /health {
+        access_log off;
+        return 200 "healthy\n";
+        add_header Content-Type text/plain;
+    }
+
+    # Favicon handling
+    location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+    }
+}

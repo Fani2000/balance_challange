@@ -1,23 +1,11 @@
 {
   "Version": 1,
-  "Hash": "xbSkz/FvOvtxhCci46/2yGb23sdlfU+9P+eM8+CV9fs=",
+  "Hash": "cVIkCITQl3OgxYQEWGap5TrPku4wpbU23GrDekTBJuU=",
   "Source": "Aspire.ApiService",
   "BasePath": "_content/Aspire.ApiService",
   "Mode": "Default",
   "ManifestType": "Build",
-  "ReferencedProjectsConfiguration": [
-    {
-      "Identity": "C:\\Users\\keorapetse.fani\\source\\repos\\balance_challange\\src\\frontend\\frontend.esproj",
-      "Version": 2,
-      "Source": "frontend",
-      "GetPublishAssetsTargets": "GetCurrentProjectPublishStaticWebAssetItems",
-      "AdditionalPublishProperties": "Configuration=Debug;Platform=AnyCPU",
-      "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained",
-      "GetBuildAssetsTargets": "GetCurrentProjectBuildStaticWebAssetItems",
-      "AdditionalBuildProperties": "Configuration=Debug;Platform=AnyCPU",
-      "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained"
-    }
-  ],
+  "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [],
   "Assets": [],
   "Endpoints": []

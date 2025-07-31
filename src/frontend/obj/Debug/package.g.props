@@ -7,7 +7,7 @@
     <PackageJsonType Condition="$(PackageJsonType) == ''">module</PackageJsonType>
     <PackageJsonEnginesNode Condition="$(PackageJsonEnginesNode) == ''">^20.19.0 || &gt;=22.12.0</PackageJsonEnginesNode>
     <PackageJsonScriptsDev Condition="$(PackageJsonScriptsDev) == ''">vite</PackageJsonScriptsDev>
-    <PackageJsonScriptsBuild Condition="$(PackageJsonScriptsBuild) == ''">run-p type-check "build-only {@}" --</PackageJsonScriptsBuild>
+    <PackageJsonScriptsBuild Condition="$(PackageJsonScriptsBuild) == ''">run-p type-check --</PackageJsonScriptsBuild>
     <PackageJsonScriptsPreview Condition="$(PackageJsonScriptsPreview) == ''">vite preview</PackageJsonScriptsPreview>
     <PackageJsonScriptsBuildOnly Condition="$(PackageJsonScriptsBuildOnly) == ''">vite build</PackageJsonScriptsBuildOnly>
     <PackageJsonScriptsTypeCheck Condition="$(PackageJsonScriptsTypeCheck) == ''">vue-tsc --build</PackageJsonScriptsTypeCheck>

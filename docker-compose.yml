@@ -1,0 +1,84 @@
+﻿version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:17.5
+    container_name: bankingapp_postgres
+    environment:
+      POSTGRES_DB: bankingapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - bankingapp_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: bankingapp_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - bankingapp_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: redis-server --appendonly yes
+
+  # Backend API
+  backend:
+    build:
+      context: . 
+      dockerfile: ./src/Aspire.ApiService/Dockerfile
+    container_name: bankingapp_backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__bankingdb=Host=postgres;Database=bankingapp;Username=postgres;Password=password
+      - ConnectionStrings__cache=redis:6379
+    ports:
+      - "8080:8080"
+    networks:
+      - bankingapp_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Frontend
+  frontend:
+    build:
+      context: ./src/frontend/
+      dockerfile: Dockerfile
+    container_name: bankingapp_frontend
+    environment:
+      - VITE_API_URL=http://localhost:8080
+      - NODE_ENV=development
+      - Name=Fani
+    ports:
+      - "3000:80"
+    networks:
+      - bankingapp_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  bankingapp_network:
+    driver: bridge

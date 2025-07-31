@@ -679,8 +679,6 @@ export const useBankingStore = defineStore('banking', {
     // ========================================
 
     logTransactionState(context: string = ''): void {
-      if (process.env.NODE_ENV !== 'development') return
-
       const tempTransactions = this.transactions.filter(t => t.id.toString().startsWith('temp_'))
       const confirmedTransactions = this.transactions.filter(t => !t.id.toString().startsWith('temp_'))
 
