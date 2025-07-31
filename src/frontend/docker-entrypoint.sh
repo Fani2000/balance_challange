@@ -1,17 +1,59 @@
 ﻿#!/bin/sh
 
-# Process the config.js file with environment variables
-envsubst < /usr/share/nginx/html/config.js.template > /usr/share/nginx/html/config.js
+# Docker entrypoint script for injecting environment variables into config.js
+set -e
 
-# Process the nginx configuration template
-envsubst '${VITE_API_URL}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
+echo "🚀 Starting RMA Frontend Application..."
 
-# Check if the API endpoint is set and valid
-if [ -z "$VITE_API_URL" ] || [ "$VITE_API_URL" = "http://localhost:5000" ]; then
-  echo "Warning: VITE_API_URL is not set or is using the example value. API proxy will not work correctly."
-  # Remove the API proxy configuration to avoid nginx startup errors
-  sed -i '/location \/api\//,/}/d' /etc/nginx/conf.d/default.conf
+# Set default values for environment variables if not provided
+export VITE_API_URL="${VITE_API_URL:-http://localhost:5450}"
+export NODE_ENV="${NODE_ENV:-production}"
+
+echo "📝 Generating runtime configuration..."
+
+# Create config.js with backend URL (runtime injection)
+cat > /usr/share/nginx/html/config.js << EOF
+window.ENV = {
+  VITE_API_URL: "${VITE_API_URL}",
+  NODE_ENV: "${NODE_ENV}",
+  VERSION: "$(date +%Y%m%d-%H%M%S)"
+};
+EOF
+
+echo "✅ Configuration generated successfully"
+
+# Print configuration for debugging (mask sensitive data)
+echo "🔧 Runtime Configuration:"
+echo "  - Backend URL: $VITE_API_URL"
+echo "  - Environment: $NODE_ENV"
+
+# Generate nginx configuration from template if it exists
+if [ -f "/etc/nginx/conf.d/default.conf.template" ]; then
+    echo "🌐 Configuring Nginx from template..."
+    envsubst '${VITE_API_URL}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
+    
+    # Validate nginx configuration
+    echo "🔍 Validating Nginx configuration..."
+    if nginx -t; then
+        echo "✅ Nginx configuration is valid"
+    else
+        echo "❌ Nginx configuration is invalid"
+        echo "Generated configuration:"
+        cat /etc/nginx/conf.d/default.conf
+        exit 1
+    fi
+else
+    echo "ℹ️ Using default nginx configuration"
 fi
 
-# Start nginx
+# Ensure proper file permissions
+chown -R nginx:nginx /usr/share/nginx/html
+chmod -R 755 /usr/share/nginx/html
+
+echo "🚀 Starting Nginx..."
+
+# Create a simple signal handler to prevent unexpected shutdowns
+trap 'echo "Received shutdown signal, stopping gracefully..."; nginx -s quit; exit 0' TERM INT QUIT
+
+# Start nginx in foreground
 exec nginx -g 'daemon off;'
