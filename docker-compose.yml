@@ -62,9 +62,7 @@ services:
 
   # Frontend
   frontend:
-    build:
-      context: ./src/frontend/
-      dockerfile: Dockerfile
+    image: keorapetse159/banking-frontend:v7
     container_name: bankingapp_frontend
     environment:
       - VITE_API_URL=http://localhost:8080
