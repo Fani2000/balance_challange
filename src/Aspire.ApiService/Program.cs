@@ -49,20 +49,13 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var port = Environment.GetEnvironmentVariable("PORT");
-
-builder.WebHost.UseUrls($"http://+:{port}");
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 // app.MapDefaultEndpoints();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCors("AllowAllOrigins");
 
