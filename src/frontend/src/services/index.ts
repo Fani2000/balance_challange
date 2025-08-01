@@ -21,6 +21,9 @@ class ServiceFactory {
   private services: Map<string, IWalletService | ITransactionService>
 
   constructor(baseConfig: ServiceConfig) {
+    console.log("Process: ", process.env.VITE_API_URL)
+    console.log("ProcessENV: ", process.env)
+    console.log("ProcessENV: ", import.meta.env)
     this.config = baseConfig
     this.services = new Map()
   }

@@ -21,7 +21,7 @@ RUN echo '#!/bin/sh' > /docker-entrypoint.sh && \
     echo 'echo "🚀 Starting Banking App..."' >> /docker-entrypoint.sh && \
     echo '' >> /docker-entrypoint.sh && \
     echo '# Set default values' >> /docker-entrypoint.sh && \
-    echo 'export VITE_API_URL="${VITE_API_URL:-http://localhost:8080}"' >> /docker-entrypoint.sh && \
+    echo 'export VITE_API_URL="${VITE_API_URL:-https://fani-backend-bbaqcrdzbgggaqbq.canadacentral-01.azurewebsites.net}"' >> /docker-entrypoint.sh && \
     echo 'export NODE_ENV="${NODE_ENV:-production}"' >> /docker-entrypoint.sh && \
     echo '' >> /docker-entrypoint.sh && \
     echo '# Generate config.js with environment variables' >> /docker-entrypoint.sh && \

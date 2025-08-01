@@ -5,7 +5,7 @@
     max-width="500"
     persistent
   >
-    <v-card rounded="xl" class="elevation-12">
+    <v-card rounded="xl" class="elevation-12" style="zoom: 75%">
       <v-card-title class="pa-6 pb-4">
         <div class="d-flex align-center">
           <v-avatar color="success" class="mr-3" size="40">
@@ -208,7 +208,6 @@ const handleSubmit = async () => {
   loading.value = true
 
   try {
-    await deposit(parseFloat(amount.value))
 
     // Emit success event to parent component
     emit('success', parseFloat(amount.value), paymentMethod.value)

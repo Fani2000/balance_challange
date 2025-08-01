@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50" style="zoom: 75%">
     <!-- Header -->
     <v-app-bar
       color="white"
@@ -113,6 +113,7 @@
               :transactions="filteredTransactions"
               :loading="loading.transactions"
               @refresh="fetchTransactions"
+              @load-more="fetchTransactions"
             />
           </v-card>
         </div>
@@ -174,10 +175,10 @@ import WithdrawModal from '../components/Modals/WithdrawModal.vue'
 import ErrorMessage from '../components/ErrorMessage.vue'
 
 // Store
-const { fetchWallet, addDeposit } = useWalletStore()
+const { fetchWallet, addDeposit, withdraw } = useWalletStore()
 const { fetchTransactions } = useTransactionStore()
 const { transactions, loading: transactionLoading } = storeToRefs(useTransactionStore())
-const { balance, currency, withdraw, loading:walletLoading, error:walletError } = storeToRefs(useWalletStore())
+const { balance, currency, loading:walletLoading, error:walletError } = storeToRefs(useWalletStore())
 const {showDepositModal, showWithdrawModal} = storeToRefs(useUIStore())
 const {openDepositModal, openWithdrawModal} = useUIStore()
 
@@ -245,7 +246,9 @@ const scrollToTransactions = () => {
 
 const handleDepositSuccess = async (amount, paymentMethod) => {
   try {
-    addDeposit(amount)
+    await addDeposit(amount, paymentMethod)
+
+    await fetchTransactions()
 
     showNotification(
       `Successfully deposited ${currency.value}${amount.toLocaleString()}`,
@@ -263,7 +266,9 @@ const handleDepositSuccess = async (amount, paymentMethod) => {
 
 const handleWithdrawSuccess = async (amount, method) => {
   try {
-    withdraw(amount)
+    await withdraw(amount, method)
+
+    await fetchTransactions()
 
     showNotification(
       `Successfully withdrew ${currency.value}${amount.toLocaleString()}`,

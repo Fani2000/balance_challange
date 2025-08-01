@@ -5,7 +5,7 @@
     max-width="500"
     persistent
   >
-    <v-card rounded="xl" class="elevation-12">
+    <v-card rounded="xl" class="elevation-12" style="zoom: 75%">
       <v-card-title class="pa-6 pb-4">
         <div class="d-flex align-center">
           <v-avatar color="warning" class="mr-3" size="40">
@@ -180,7 +180,6 @@ const emit = defineEmits(['update:modelValue', 'success'])
 
 // Store
 const { balance, loading, error } = storeToRefs(useWalletStore())
-const { withdraw } = useWalletStore()
 
 // Form state
 const form = ref(null)
@@ -245,9 +244,6 @@ const handleSubmit = async () => {
   loading.value = true
 
   try {
-    // Use store withdraw method which calls the API
-    await withdraw(parseFloat(amount.value), withdrawalMethod.value)
-
     // Emit success event to parent component
     emit('success', parseFloat(amount.value), withdrawalMethod.value)
 

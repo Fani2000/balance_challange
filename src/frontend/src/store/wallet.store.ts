@@ -34,14 +34,18 @@ export const useWalletStore = defineStore('wallet', {
       }
     },
 
-    addDeposit(amount: number) {
+    async addDeposit(amount: number, paymentMethod?: string) {
       this.balance += amount
-      // walletService.transferMoney("Fani", amount)
+      if(paymentMethod !== undefined) {
+        await walletService.deposit(amount, paymentMethod!)
+      }
     },
 
-    withdraw(amount: number) {
+    async withdraw(amount: number, paymentMethod?: string) {
       this.balance -= amount
-      // walletService.withdraw( amount, "Card")
+      if(paymentMethod !== undefined){
+        await walletService.withdraw( amount, paymentMethod!)
+      }
     },
 
     clearError() {

@@ -15,18 +15,18 @@
       <jdbc-url>jdbc:redis://9gkAjramD77D2GybCBEh5U@localhost:49865</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="bankingdb" uuid="98c774dd-d183-4fb1-92ca-f0e828a94a69">
+    <data-source source="LOCAL" name="bankingdb" uuid="08a2722b-aceb-4a6c-b696-642c39aaafd6">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:61308/bankingdb?password=ad1DdamAwvr3c-h1Q3m0k_&amp;user=postgres</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:52468/bankingdb?password=ad1DdamAwvr3c-h1Q3m0k_&amp;user=postgres</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="cache" uuid="3bfac5e8-3be3-4b5d-baad-1b71d175e1c8">
+    <data-source source="LOCAL" name="cache" uuid="92928cd7-ee47-46db-9783-b076c3026b7c">
       <driver-ref>redis</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>jdbc.RedisDriver</jdbc-driver>
-      <jdbc-url>jdbc:redis://9gkAjramD77D2GybCBEh5U@localhost:61309</jdbc-url>
+      <jdbc-url>jdbc:redis://9gkAjramD77D2GybCBEh5U@localhost:52465</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
