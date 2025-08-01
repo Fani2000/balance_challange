@@ -279,49 +279,6 @@ flowchart TD
     style I fill:#fff3e0
 ```
 
-## 🏗️ System Integration Overview
-
-```mermaid
-mindmap
-  root((🏦 Aspire Banking App))
-    Frontend
-      User Interface
-        Dashboard
-        Modals
-        Cards
-      State Management
-        Wallet Store
-        Transaction Store
-        UI Store
-      Services
-        API Communication
-        Data Formatting
-    Backend
-      Controllers
-        Account Management
-        Transaction Processing
-      Business Logic
-        Validation Rules
-        Business Operations
-      Data Access
-        Database Queries
-        Entity Mapping
-    Database
-      Tables
-        Accounts
-        Transactions
-      Relationships
-        One-to-Many
-        Foreign Keys
-    Infrastructure
-      Hosting
-        Web Server
-        Database Server
-      Security
-        Input Validation
-        Data Protection
-```
-
 ## 🎯 Simple Component Connections
 
 Think of each component like **LEGO blocks** that snap together:
