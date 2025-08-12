@@ -10,14 +10,14 @@
 
       <div class="d-flex flex-column flex-md-row justify-space-between align-start position-relative">
         <div class="flex-grow-1 mb-4 mb-md-0">
-          <p class="text-subtitle-2 opacity-90 mb-2">Wallet Balance</p>
+          <p class="text-subtitle-2 opacity-90 mb-2">{{ $t('wallet.balance') }}</p>
           <div class="d-flex align-baseline mb-2">
             <span class="text-h3 text-md-h2 font-weight-bold mr-2">
               {{ formatCurrency(balance) }}
             </span>
             <span class="text-h6 opacity-80">{{ currency }}</span>
           </div>
-          <p class="text-caption opacity-75">Available for gaming</p>
+          <p class="text-caption opacity-75">{{ $t('wallet.available') }}</p>
         </div>
 
         <div class="d-flex flex-column flex-sm-row ga-3">
@@ -33,7 +33,7 @@
             <template #prepend>
               <v-icon>mdi-plus</v-icon>
             </template>
-            Deposit
+            {{ $t('wallet.deposit') }}
           </v-btn>
 
           <v-btn
@@ -48,7 +48,7 @@
             <template #prepend>
               <v-icon>mdi-minus</v-icon>
             </template>
-            Withdraw
+            {{ $t('wallet.withdraw') }}
           </v-btn>
         </div>
       </div>
@@ -57,15 +57,15 @@
       <div class="d-flex justify-space-between mt-6 pt-4 border-t border-opacity-25">
         <div class="text-center">
           <v-icon color="green-lighten-2" class="mb-1">mdi-trending-up</v-icon>
-          <p class="text-caption opacity-80">+12.5% this month</p>
+          <p class="text-caption opacity-80">{{ $t('wallet.monthlyGrowth', [12.5]) }}</p>
         </div>
         <div class="text-center">
           <v-icon color="blue-lighten-2" class="mb-1">mdi-shield-check</v-icon>
-          <p class="text-caption opacity-80">Secure & Protected</p>
+          <p class="text-caption opacity-80">{{ $t('wallet.secure') }}</p>
         </div>
         <div class="text-center">
           <v-icon color="yellow-lighten-2" class="mb-1">mdi-lightning-bolt</v-icon>
-          <p class="text-caption opacity-80">Instant Transfers</p>
+          <p class="text-caption opacity-80">{{ $t('wallet.instant') }}</p>
         </div>
       </div>
     </div>
@@ -73,6 +73,10 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
 defineProps({
   balance: {
     type: Number,

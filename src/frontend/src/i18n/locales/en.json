@@ -1,0 +1,57 @@
+{
+  "wallet": {
+    "balance": "Wallet Balance",
+    "available": "Available for gaming",
+    "deposit": "Deposit",
+    "withdraw": "Withdraw",
+    "monthlyGrowth": "+{0}% this month",
+    "secure": "Secure & Protected",
+    "instant": "Instant Transfers"
+  },
+  "transactions": {
+    "title": "Recent Transactions",
+    "empty": {
+      "title": "No transactions yet",
+      "subtitle": "Your transaction history will appear here",
+      "refresh": "Refresh"
+    },
+    "loadMore": "Load More Transactions",
+    "types": {
+      "deposit": "Deposit",
+      "withdrawal": "Withdrawal",
+      "transfer": "Transfer"
+    },
+    "status": {
+      "completed": "COMPLETED",
+      "pending": "PENDING",
+      "failed": "FAILED"
+    }
+  },
+  "deposit": {
+    "title": "Deposit Funds",
+    "subtitle": "Add money to your wallet",
+    "amount": "Amount",
+    "quickAmounts": "Quick amounts:",
+    "paymentMethod": "Payment Method",
+    "currentBalance": "Current balance: {0}",
+    "security": "Your payment is secured with 256-bit SSL encryption."
+  },
+  "withdraw": {
+    "title": "Withdraw Funds",
+    "subtitle": "Cash out from your wallet",
+    "amount": "Amount",
+    "quickAmounts": "Quick amounts:",
+    "withdrawalMethod": "Withdrawal Method",
+    "availableBalance": "Available balance: {0}",
+    "insufficientFunds": "Insufficient funds for withdrawal"
+  },
+  "filters": {
+    "all": "All Types",
+    "deposits": "Deposits",
+    "withdrawals": "Withdrawals",
+    "newest": "Newest First",
+    "oldest": "Oldest First",
+    "highest": "Highest Amount",
+    "lowest": "Lowest Amount"
+  }
+}

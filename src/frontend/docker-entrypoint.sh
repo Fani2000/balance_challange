@@ -6,7 +6,7 @@ set -e
 echo "🚀 Starting RMA Frontend Application..."
 
 # Set default values for environment variables if not provided
-export VITE_API_URL="${VITE_API_URL:-http://localhost:5450}"
+export BACKEND_URL="${BACKEND_URL:-http://localhost:5450}"
 export NODE_ENV="${NODE_ENV:-production}"
 
 echo "📝 Generating runtime configuration..."
@@ -14,7 +14,7 @@ echo "📝 Generating runtime configuration..."
 # Create config.js with backend URL (runtime injection)
 cat > /usr/share/nginx/html/config.js << EOF
 window.ENV = {
-  VITE_API_URL: "${VITE_API_URL}",
+  BACKEND_URL: "${BACKEND_URL}",
   NODE_ENV: "${NODE_ENV}",
   VERSION: "$(date +%Y%m%d-%H%M%S)"
 };
@@ -24,13 +24,13 @@ echo "✅ Configuration generated successfully"
 
 # Print configuration for debugging (mask sensitive data)
 echo "🔧 Runtime Configuration:"
-echo "  - Backend URL: $VITE_API_URL"
+echo "  - Backend URL: $BACKEND_URL"
 echo "  - Environment: $NODE_ENV"
 
 # Generate nginx configuration from template if it exists
 if [ -f "/etc/nginx/conf.d/default.conf.template" ]; then
     echo "🌐 Configuring Nginx from template..."
-    envsubst '${VITE_API_URL}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
+    envsubst '${BACKEND_URL}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
     
     # Validate nginx configuration
     echo "🔍 Validating Nginx configuration..."

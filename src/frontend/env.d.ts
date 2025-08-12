@@ -1,8 +1,7 @@
 /// <reference types="vite/client" />
-/// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_API_URL: string
+  readonly BACKEND_URL: string
 }
 
 interface ImportMeta {
@@ -11,7 +10,7 @@ interface ImportMeta {
 
 // src/env.d.ts
 interface ProcessEnv {
-  VITE_API_URL?: string;
+  BACKEND_URL?: string;
 }
 
 interface Process {

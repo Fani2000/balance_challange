@@ -10,7 +10,7 @@ import type {
 
 // Configuration
 const config:any = {
-    apiBaseUrl: (import.meta.env.VITE_API_URL ?? process.env.VITE_API_URL) + "/api",
+    apiBaseUrl: (import.meta.env.BACKEND_URL ?? process.env.BACKEND_URL ?? 'http://localhost:5518') + "/api",
     retryAttempts: 2
 }
 
@@ -21,7 +21,7 @@ class ServiceFactory {
   private services: Map<string, IWalletService | ITransactionService>
 
   constructor(baseConfig: ServiceConfig) {
-    console.log("Process: ", process.env.VITE_API_URL)
+    console.log("Process: ", process.env.BACKEND_URL)
     console.log("ProcessENV: ", process.env)
     console.log("ProcessENV: ", import.meta.env)
     this.config = baseConfig

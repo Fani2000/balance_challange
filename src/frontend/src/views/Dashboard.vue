@@ -22,6 +22,7 @@
 
       <template #append>
         <div class="d-flex align-center mr-4">
+          <language-switcher class="mr-2" />
           <v-chip variant="outlined" size="small" class="mr-3">{{ currency }}</v-chip>
           <v-btn icon size="small">
             <v-avatar size="32" class="bg-grey-lighten-2">
@@ -102,7 +103,7 @@
           <!-- Transactions Section -->
           <v-card class="elevation-2" rounded="xl" id="transactions-section">
             <v-card-title class="pa-6 pb-3 d-flex justify-space-between align-center">
-              <h3 class="text-h6 font-weight-bold">Recent Transactions</h3>
+              <h3 class="text-h6 font-weight-bold">{{ $t('transactions.title') }}</h3>
               <TransactionFilters
                 v-model:filter="transactionFilter"
                 v-model:sort="transactionSort"
@@ -173,6 +174,7 @@ import QuickActionCard from '../components/QuickActionCard.vue'
 import DepositModal from '../components/Modals/DepositModal.vue'
 import WithdrawModal from '../components/Modals/WithdrawModal.vue'
 import ErrorMessage from '../components/ErrorMessage.vue'
+import LanguageSwitcher from "../components/LanguageSwitcher.vue";
 
 // Store
 const { fetchWallet, addDeposit, withdraw } = useWalletStore()

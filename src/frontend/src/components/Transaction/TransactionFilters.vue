@@ -54,6 +54,9 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   filter: {
@@ -68,26 +71,26 @@ const props = defineProps({
 
 defineEmits(['update:filter', 'update:sort'])
 
-const filterOptions = [
-  { value: 'all', label: 'All Types' },
-  { value: 'deposit', label: 'Deposits' },
-  { value: 'withdrawal', label: 'Withdrawals' }
-]
+const filterOptions = computed(() => [
+  { value: 'all', label: t('filters.all') },
+  { value: 'deposit', label: t('filters.deposits') },
+  { value: 'withdrawal', label: t('filters.withdrawals') }
+])
 
-const sortOptions = [
-  { value: 'date-desc', label: 'Newest First' },
-  { value: 'date-asc', label: 'Oldest First' },
-  { value: 'amount-desc', label: 'Highest Amount' },
-  { value: 'amount-asc', label: 'Lowest Amount' }
-]
+const sortOptions = computed(() => [
+  { value: 'date-desc', label: t('filters.newest') },
+  { value: 'date-asc', label: t('filters.oldest') },
+  { value: 'amount-desc', label: t('filters.highest') },
+  { value: 'amount-asc', label: t('filters.lowest') }
+])
 
 const filterLabel = computed(() => {
-  const option = filterOptions.find(opt => opt.value === props.filter)
-  return option?.label || 'Filter'
+  const option = filterOptions.value.find(opt => opt.value === props.filter)
+  return option?.label || t('filters.all')
 })
 
 const sortLabel = computed(() => {
-  const option = sortOptions.find(opt => opt.value === props.sort)
-  return option?.label || 'Sort'
+  const option = sortOptions.value.find(opt => opt.value === props.sort)
+  return option?.label || t('filters.newest')
 })
 </script>

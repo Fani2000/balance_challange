@@ -1,0 +1,57 @@
+{
+  "wallet": {
+    "balance": "Solde du Portefeuille",
+    "available": "Disponible pour le jeu",
+    "deposit": "Dépôt",
+    "withdraw": "Retrait",
+    "monthlyGrowth": "+{0}% ce mois-ci",
+    "secure": "Sécurisé & Protégé",
+    "instant": "Transferts Instantanés"
+  },
+  "transactions": {
+    "title": "Transactions Récentes",
+    "empty": {
+      "title": "Pas encore de transactions",
+      "subtitle": "Votre historique de transactions apparaîtra ici",
+      "refresh": "Actualiser"
+    },
+    "loadMore": "Charger Plus de Transactions",
+    "types": {
+      "deposit": "Dépôt",
+      "withdrawal": "Retrait",
+      "transfer": "Transfert"
+    },
+    "status": {
+      "completed": "TERMINÉ",
+      "pending": "EN ATTENTE",
+      "failed": "ÉCHOUÉ"
+    }
+  },
+  "deposit": {
+    "title": "Déposer des Fonds",
+    "subtitle": "Ajouter de l'argent à votre portefeuille",
+    "amount": "Montant",
+    "quickAmounts": "Montants rapides:",
+    "paymentMethod": "Méthode de Paiement",
+    "currentBalance": "Solde actuel: {0}",
+    "security": "Votre paiement est sécurisé avec un cryptage SSL 256 bits."
+  },
+  "withdraw": {
+    "title": "Retirer des Fonds",
+    "subtitle": "Encaisser depuis votre portefeuille",
+    "amount": "Montant",
+    "quickAmounts": "Montants rapides:",
+    "withdrawalMethod": "Méthode de Retrait",
+    "availableBalance": "Solde disponible: {0}",
+    "insufficientFunds": "Fonds insuffisants pour le retrait"
+  },
+  "filters": {
+    "all": "Tous les Types",
+    "deposits": "Dépôts",
+    "withdrawals": "Retraits",
+    "newest": "Plus Récent d'abord",
+    "oldest": "Plus Ancien d'abord",
+    "highest": "Montant le Plus Élevé",
+    "lowest": "Montant le Plus Bas"
+  }
+}
